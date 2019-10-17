@@ -15,12 +15,14 @@ from lightfm import __version__ as version  # NOQA
 def define_extensions(use_openmp):
     compile_args = ['-ffast-math']
 
-    # There are problems with illegal ASM instructions
-    # when using the Anaconda distribution (at least on OSX).
-    # This could be because Anaconda uses its own assembler?
-    # To work around this we do not add -march=native if we
-    # know we're dealing with Anaconda
-    if 'anaconda' not in sys.version.lower():
+    if 'LIGHTFM_MARCH' in os.environ:
+        compile_args.append('-march={}'.format(os.environ['LIGHTFM_MARCH']))
+    elif 'anaconda' not in sys.version.lower():
+        # There are problems with illegal ASM instructions
+        # when using the Anaconda distribution (at least on OSX).
+        # This could be because Anaconda uses its own assembler?
+        # To work around this we do not add -march=native if we
+        # know we're dealing with Anaconda
         compile_args.append('-march=native')
 
     if not use_openmp:
